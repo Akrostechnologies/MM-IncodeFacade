@@ -57,17 +57,7 @@ final class MMSignature {
             title: item.title,
             description: item.description,
             descriptionMaxLines: item.maxlinesDescription,
-            documents: buildDocuments()
+            documents: item.documents.toSignDocuments()
         )
-    }
-    
-    private func buildDocuments() -> [SignDocument] {
-        item.documents.map {
-            SignDocument(
-                title: $0.title,
-                fileURL: $0.getURL(),
-                signaturePositions: []
-            )
-        }
     }
 }

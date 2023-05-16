@@ -15,7 +15,6 @@ struct IncodeContainerView: UIViewControllerRepresentable {
     // ---------------------------------------------------------------------
     // MARK: UIViewControllerRepresentable
     // ---------------------------------------------------------------------
-    
 
     func makeUIViewController(context: Context) -> UIViewController {
         return UIViewController()

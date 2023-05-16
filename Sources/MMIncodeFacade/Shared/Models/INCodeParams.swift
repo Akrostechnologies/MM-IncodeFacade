@@ -9,9 +9,17 @@ import Foundation
 
 public struct INCodeParams {
     
+    // ---------------------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------------------
+    
     let urlString: String
     let apiKey: String
     let testMode: Bool
+    
+    // ---------------------------------------------------------------------
+    // MARK: Constructor
+    // ---------------------------------------------------------------------
     
     public init(
         urlString: String,

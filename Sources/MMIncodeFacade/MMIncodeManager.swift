@@ -33,7 +33,12 @@ final public class MMIncodeManager {
     // MARK: Constructor
     // ---------------------------------------------------------------------
     
-    public init(_ params: INCodeParams, completation: Completation? = nil) {
+    public init(
+        _ params: INCodeParams,
+        themeColors: ColorsConfiguration = DefaultMMTheme.colors,
+        completation: Completation? = nil
+    ) {
+        DefaultMMTheme.colors = themeColors
         setupInit(params: params, completation: completation)
     }
     
@@ -64,7 +69,8 @@ final public class MMIncodeManager {
             testMode: params.testMode,
             completation
         )
-        IncdOnboardingManager.shared.sdkMode = .standard
+        IncdTheme.current = DefaultMMTheme.buildTheme()
+        IncdOnboardingManager.shared.allowUserToCancel = true
     }
     
     public func presentSignature(item: SignatureModel) -> some View {
@@ -90,13 +96,35 @@ extension MMIncodeManager: IncdOnboardingDelegate {
     // MARK: IncdOnboardingDelegate
     // ---------------------------------------------------------------------
     
-    public func onSuccess() {
-        onFinishFlow.send(.success)
-        isActiveFLow = false
-    }
+    public func onSuccess() {}
     
     public func onError(_ error: IncdOnboarding.IncdFlowError) {
-        onFinishFlow.send(.error(message: error.description))
+        finishFLow(with: .error(message: error.description))
+    }
+    
+    public func userCancelledSession() {
+        finishFLow(with: .userFinish)
+    }
+    
+    public func onSignatureCollected(_ result: SignatureFormResult) {
+        
+        guard let error = result.error else {
+            let items = result.signedDocuments?.toDocumentModel() ?? []
+            return finishFLow(with: .success(documents: items))
+        }
+        
+        switch error {
+            case .declinedToSignDocument:
+                finishFLow(with: .userFinish)
+            case .error(let error):
+                finishFLow(with: .error(message: error.description))
+            @unknown default:
+                finishFLow(with: .error(message: "Something whent wrong"))
+        }
+    }
+    
+    private func finishFLow(with status: FlowStatus) {
+        onFinishFlow.send(status)
         isActiveFLow = false
     }
 }
@@ -108,7 +136,8 @@ public extension MMIncodeManager {
     // ---------------------------------------------------------------------
     
     enum FlowStatus {
-        case success
+        case success(documents: [DocumentModel])
+        case userFinish
         case error(message: String)
     }
 }
