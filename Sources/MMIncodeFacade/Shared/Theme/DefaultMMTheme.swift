@@ -6,9 +6,18 @@
 //
 
 import Foundation
+import UIKit
 import IncdOnboarding
 
 public struct DefaultMMTheme {
+    
+    static let fontsConfig = FontsConfiguration(
+        title: .systemFont(ofSize: 28, weight: .semibold),
+        body: .systemFont(ofSize: 15, weight: .regular),
+        buttonBig: .systemFont(ofSize: 15, weight: .semibold),
+        buttonMedium: .systemFont(ofSize: 15, weight: .semibold)
+    )
+    
     
     // ---------------------------------------------------------------------
     // MARK: Properties
@@ -29,9 +38,9 @@ public struct DefaultMMTheme {
     static func buildTheme() -> IncdOnboarding.ThemeConfiguration {
         return .init(
             colors: colors,
+            fonts: fontsConfig,
             buttons: .init(
-                primary: primaryButton,
-                text: textButton
+                primary: primaryButton
             ),
             labels: .init(
                 title: defaultLabelConfiguration(),
@@ -48,9 +57,12 @@ public struct DefaultMMTheme {
     // ---------------------------------------------------------------------
     
     private static var primaryButton: ButtonConfiguration {
+        let height: CGFloat = 50
+        let radius = height / 2
+        
         let normal = ButtonThemedState(
             backgroundColor: colors.accent,
-            cornerRadius: cornerRadius,
+            cornerRadius: radius,
             shadowColor: .clear,
             shadowOffset: .zero,
             textColor: colors.background
@@ -59,54 +71,19 @@ public struct DefaultMMTheme {
         var highlighted = normal
         highlighted.backgroundColor = colors.accent.withAlphaComponent(0.8)
         highlighted.textColor = colors.background
-        highlighted.cornerRadius = cornerRadius
+        highlighted.cornerRadius = radius
         
         var disabled = normal
         disabled.backgroundColor = colors.disabled
         disabled.textColor = colors.primary
         
-        let big = buttonSize(height: 40)
-        let medium = buttonSize(height: 30)
-        
         return .init(
             states: .init(
                 normal: normal,
                 highlighted: highlighted,
                 disabled: disabled
             ),
-            big: big,
-            medium: medium
-        )
-    }
-    
-    private static var textButton: ButtonConfiguration {
-        let normal = ButtonThemedState(
-            backgroundColor: .clear,
-            cornerRadius: cornerRadius,
-            shadowColor: .clear,
-            shadowOffset: .zero,
-            textColor: colors.accent
-        )
-        
-        var disabled = normal
-        disabled.backgroundColor = .clear
-        disabled.textColor = colors.disabled
-        
-        var highlighted = normal
-        highlighted.backgroundColor = .clear
-        highlighted.cornerRadius = cornerRadius
-        
-        let big = buttonSize(height: 40)
-        let medium = buttonSize(height: 30)
-        
-        return .init(
-            states: .init(
-                normal: normal,
-                highlighted: highlighted,
-                disabled: disabled
-            ),
-            big: big,
-            medium: medium
+            big: buttonSize(height: height)
         )
     }
     
@@ -120,9 +97,8 @@ public struct DefaultMMTheme {
     private static func buttonSize(height: CGFloat = 40, padding: CGFloat = 5) -> ButtonSizeVariant {
         return .init(
             height: height,
+            minWidth: (UIScreen.main.bounds.width) - (20 * 2),
             contentInsets: .init(top: padding, left: padding, bottom: padding, right: padding)
         )
     }
-    
-    private static let cornerRadius: CGFloat = 24
 }
