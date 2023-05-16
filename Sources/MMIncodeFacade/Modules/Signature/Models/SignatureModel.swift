@@ -13,6 +13,7 @@ public struct SignatureModel {
     // MARK: Properties
     // ---------------------------------------------------------------------
 
+    let id: String
     let documents: [DocumentModel]
     let title: String?
     let description: String?
@@ -26,11 +27,13 @@ public struct SignatureModel {
         documents: [DocumentModel],
         title: String? = nil,
         description: String? = nil,
-        maxlinesDescription: Int? = nil
+        maxlinesDescription: Int? = nil,
+        id: String = UUID().uuidString
     ) {
         self.documents = documents
         self.title = title
         self.description = description
         self.maxlinesDescription = maxlinesDescription
+        self.id = id
     }
 }

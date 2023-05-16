@@ -21,8 +21,6 @@ extension Array where Element: SignDocument {
 extension Array where Element == DocumentModel {
     
     func toSignDocuments() -> [SignDocument] {
-        self.map({
-            .init(title: $0.title, fileURL: $0.getURL(), signaturePositions: [])
-        })
+        self.map{ $0.toSignDocuments() }
     }
 }

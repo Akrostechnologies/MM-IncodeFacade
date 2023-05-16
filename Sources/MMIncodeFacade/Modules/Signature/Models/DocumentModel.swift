@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import IncdOnboarding
 
 public struct DocumentModel {
     
@@ -32,5 +32,9 @@ public struct DocumentModel {
     
     func getURL() -> URL {
         .init(string: urlString)!
+    }
+    
+    func toSignDocuments() -> SignDocument {
+        .init(title: title, fileURL: getURL(), signaturePositions: [])
     }
 }
