@@ -18,10 +18,6 @@ public struct DefaultMMTheme {
         accent: .green,
         primary: .white,
         background: .black,
-        secondaryBackground: .white.withAlphaComponent(0.2),
-        success: .systemPink,
-        error: .blue,
-        warning: .orange,
         cancel: .green,
         disabled: .white.withAlphaComponent(0.2)
     )
@@ -31,21 +27,16 @@ public struct DefaultMMTheme {
     // ---------------------------------------------------------------------
     
     static func buildTheme() -> IncdOnboarding.ThemeConfiguration {
-        
-        let labelsConfig = LabelsConfiguration(
-            title: defaultLabelConfiguration(),
-            body: defaultLabelConfiguration()
-        )
-        
-        let buttonsConfig = ButtonsConfiguration(
-            primary: primaryButton,
-            text: textButton
-        )
-        
         return .init(
             colors: colors,
-            buttons: buttonsConfig,
-            labels: labelsConfig,
+            buttons: .init(
+                primary: primaryButton,
+                text: textButton
+            ),
+            labels: .init(
+                title: defaultLabelConfiguration(),
+                body: defaultLabelConfiguration()
+            ),
             customComponents: .init(
                 signature: .init(signatureColor: .white, canvasBorderColor: .white)
             )
