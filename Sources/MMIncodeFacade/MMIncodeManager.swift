@@ -35,7 +35,7 @@ final public class MMIncodeManager {
     
     public init(
         _ params: INCodeParams,
-        themeColors: ColorsConfiguration = DefaultMMTheme.colors,
+        themeColors: ThemeColors = DefaultMMTheme.colors,
         completation: Completation? = nil
     ) {
         DefaultMMTheme.colors = themeColors

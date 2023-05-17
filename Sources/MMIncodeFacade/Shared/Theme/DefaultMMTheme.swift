@@ -23,12 +23,12 @@ public struct DefaultMMTheme {
     // MARK: Properties
     // ---------------------------------------------------------------------
     
-    public static var colors = ColorsConfiguration (
+    public static var colors = ThemeColors (
         accent: .green,
         primary: .white,
         background: .black,
         cancel: .green,
-        disabled: .white.withAlphaComponent(0.2)
+        disabled: .white.opacity(0.2)
     )
     
     // ---------------------------------------------------------------------
@@ -37,7 +37,7 @@ public struct DefaultMMTheme {
     
     static func buildTheme() -> IncdOnboarding.ThemeConfiguration {
         return .init(
-            colors: colors,
+            colors: colors.toThemeConfiguration(),
             fonts: fontsConfig,
             buttons: .init(
                 primary: primaryButton
@@ -57,6 +57,7 @@ public struct DefaultMMTheme {
     // ---------------------------------------------------------------------
     
     private static var primaryButton: ButtonConfiguration {
+        let colors = colors.toThemeConfiguration()
         let height: CGFloat = 50
         let radius = height / 2
         
@@ -76,6 +77,7 @@ public struct DefaultMMTheme {
         var disabled = normal
         disabled.backgroundColor = colors.disabled
         disabled.textColor = colors.primary
+        disabled.cornerRadius = radius
         
         return .init(
             states: .init(
@@ -90,7 +92,7 @@ public struct DefaultMMTheme {
     private static func defaultLabelConfiguration() -> LabelConfiguration{
         LabelConfiguration(
             textAlignment: .justified,
-            textColor: colors.primary
+            textColor: colors.primary.toUIColor
         )
     }
     
