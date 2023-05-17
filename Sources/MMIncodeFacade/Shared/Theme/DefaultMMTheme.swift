@@ -40,7 +40,8 @@ public struct DefaultMMTheme {
             colors: colors.toThemeConfiguration(),
             fonts: fontsConfig,
             buttons: .init(
-                primary: primaryButton
+                primary: primaryButton,
+                text: textButton
             ),
             labels: .init(
                 title: defaultLabelConfiguration(),
@@ -86,6 +87,39 @@ public struct DefaultMMTheme {
                 disabled: disabled
             ),
             big: buttonSize(height: height)
+        )
+    }
+    
+    private static var textButton: ButtonConfiguration {
+        let colors = colors.toThemeConfiguration()
+        let height: CGFloat = 50
+        let radius: CGFloat = 0
+        
+        let normal = ButtonThemedState(
+            backgroundColor: .clear,
+            cornerRadius: radius,
+            shadowColor: .clear,
+            shadowOffset: .zero,
+            textColor: colors.accent
+        )
+        
+        var disabled = normal
+        disabled.backgroundColor = .clear
+        disabled.textColor = colors.disabled
+        
+        var highlighted = normal
+        highlighted.backgroundColor = .clear
+        highlighted.cornerRadius = radius
+        
+        let big = buttonSize(height: height)
+        
+        return .init(
+            states: .init(
+                normal: normal,
+                highlighted: highlighted,
+                disabled: disabled
+            ),
+            big: big
         )
     }
     
