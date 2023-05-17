@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 import IncdOnboarding
 
@@ -27,7 +26,7 @@ public struct ThemeColors {
     // MARK: Constructor
     // ---------------------------------------------------------------------
     
-    public init(accent: SwiftUI.Color, primary: SwiftUI.Color, background: SwiftUI.Color, cancel: SwiftUI.Color, disabled: SwiftUI.Color) {
+    public init(accent: Color, primary: Color, background: Color, cancel: Color, disabled: Color) {
         self.accent = accent
         self.primary = primary
         self.background = background
