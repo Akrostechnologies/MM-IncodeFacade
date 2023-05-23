@@ -61,7 +61,30 @@ final public class MMIncodeManager {
     // MARK: Helper funcs
     // ---------------------------------------------------------------------
     
-    private func setupInit(params: INCodeParams, completation: Completation?) {
+    public func presentSignature(item: SignatureModel?) -> some View {
+        let emptyView = AnyView(EmptyView())
+        guard let item else {
+            finishFLow(with: .invalidData)
+            return emptyView
+        }
+        guard !isActiveFLow else { return emptyView }
+        isActiveFLow = true
+        let view = SignatureContentView(viewModel: .init(signature: item)) { [weak self] in
+            self?.setupSignature(item: item)
+        } onClose: { [weak self] in
+            self?.finishFLow(with: .userFinish)
+        }
+        return AnyView(view)
+    }
+}
+
+extension MMIncodeManager {
+    
+    // ---------------------------------------------------------------------
+    // MARK: Setup
+    // ---------------------------------------------------------------------
+    
+    fileprivate func setupInit(params: INCodeParams, completation: Completation?) {
         IncdOnboardingManager.shared.initIncdOnboarding(
             url: params.urlString,
             apiKey: params.apiKey,
@@ -73,9 +96,7 @@ final public class MMIncodeManager {
         IncdOnboardingManager.shared.allowUserToCancel = true
     }
     
-    public func presentSignature(item: SignatureModel) -> some View {
-        guard !isActiveFLow else { return signatureFeature.containerView }
-        isActiveFLow = true
+    fileprivate func setupSignature(item: SignatureModel) -> some View {
         signatureFeature = .init(
             flowConfiguration: flowConfiguration,
             item: item
@@ -86,21 +107,7 @@ final public class MMIncodeManager {
         )
         return signatureFeature.containerView
     }
-    
-    public func presentSignatureWithPreview(item: SignatureModel?) -> some View {
-        guard let item else {
-            finishFLow(with: .invalidData)
-            return AnyView(EmptyView())
-        }
-        let view = SignatureContentView(viewModel: .init(signature: item)) { [weak self] in
-            self?.presentSignature(item: item)
-        } onClose: { [weak self] in
-            self?.finishFLow(with: .userFinish)
-        }
-        return AnyView(view)
-    }
 }
-
 
 extension MMIncodeManager: IncdOnboardingDelegate {
     
