@@ -18,8 +18,8 @@ final public class MMIncodeManager {
     // ---------------------------------------------------------------------
     
     private var signatureFeature: MMSignature!
+    fileprivate var isActiveFLow = false
     public var onFinishFlow = PassthroughSubject<FlowStatus, Never>()
-    var isActiveFLow = false
     
     // ---------------------------------------------------------------------
     // MARK: Constants
@@ -33,7 +33,7 @@ final public class MMIncodeManager {
     // ---------------------------------------------------------------------
     
     public init(
-        _ params: INCodeParams,
+        _ params: IncodeParams,
         themeColors: ThemeColors = DefaultMMTheme.colors,
         completation: Completation? = nil
     ) {
@@ -83,7 +83,7 @@ extension MMIncodeManager {
     // MARK: Setup
     // ---------------------------------------------------------------------
     
-    fileprivate func setupInit(params: INCodeParams, completation: Completation?) {
+    fileprivate func setupInit(params: IncodeParams, completation: Completation?) {
         IncdOnboardingManager.shared.initIncdOnboarding(
             url: params.urlString,
             apiKey: params.apiKey,

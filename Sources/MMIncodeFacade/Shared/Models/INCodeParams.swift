@@ -1,5 +1,5 @@
 //
-//  INCodeParams.swift
+//  IncodeParams.swift
 // MMIncodeFacade
 //
 //  Created by Andres Lozano on 9/05/23.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct INCodeParams {
+public struct IncodeParams {
     
     // ---------------------------------------------------------------------
     // MARK: Properties
