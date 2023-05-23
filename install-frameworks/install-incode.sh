@@ -7,8 +7,8 @@ run_command()
   fi
 }
 
-# remove dir
-# rm -rf './IncdOnboarding-distribution'
+# remove dir IncdOnboarding-distribution
+rm -rf './IncdOnboarding-distribution'
 
 # Clone repo
 run_command 'git clone --depth 1 --branch 5.16.0-d https://github.com/Incode-Technologies-Example-Repos/IncdOnboarding-distribution.git'
