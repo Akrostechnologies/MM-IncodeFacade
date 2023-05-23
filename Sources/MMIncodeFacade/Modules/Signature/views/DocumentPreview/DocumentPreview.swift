@@ -9,20 +9,22 @@ import SwiftUI
 
 struct DocumentPreview: View {
     
+    typealias CallBack = () -> Void
+    
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
 
     private let radius: CGFloat = 5
     private let viewModel: DocumentPreViewModel
-    private var action: (() -> Void)?
-    private var onClose: (() -> Void)?
+    private var action: CallBack?
+    private var onClose: CallBack?
 
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
 
-    init(items: [DocumentModel], action: (() -> Void)? = nil, onClose: (() -> Void)?) {
+    init(items: [DocumentModel], action: CallBack? = nil, onClose: CallBack?) {
         self.action = action
         self.onClose = onClose
         viewModel = .init(documents: items)

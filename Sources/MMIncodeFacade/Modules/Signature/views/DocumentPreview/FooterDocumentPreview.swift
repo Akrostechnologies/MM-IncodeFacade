@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FooterDocumentPreview: View {
     
+    typealias CallBack = () -> Void
+    
     // ---------------------------------------------------------------------
     // MARK: States
     // ---------------------------------------------------------------------
@@ -20,15 +22,15 @@ struct FooterDocumentPreview: View {
     // ---------------------------------------------------------------------
     
     private var isLastItem: Bool
-    private var action: (() -> Void)?
+    private var action: CallBack?
     private var items:[DocumentModel]
-    private var onClose: (() -> Void)?
+    private var onClose: CallBack?
     
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
     
-    init(isLastItem: Bool, action: (() -> Void)? = nil, items: [DocumentModel], onClose: (() -> Void)?) {
+    init(isLastItem: Bool, action: CallBack? = nil, items: [DocumentModel], onClose: CallBack?) {
         self.isLastItem = isLastItem
         self.action = action
         self.items = items

@@ -5,7 +5,6 @@
 //
 
 import SwiftUI
-import UIKit
 import PDFKit
 
 struct PDFKitView: UIViewRepresentable {

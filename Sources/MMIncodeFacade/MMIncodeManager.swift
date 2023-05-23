@@ -92,7 +92,6 @@ extension MMIncodeManager {
             completation
         )
         IncdTheme.current = DefaultMMTheme.buildTheme()
-        IncdOnboardingManager.shared.allowUserToCancel = true
     }
     
     fileprivate func setupSignature(item: SignatureModel) -> some View {
