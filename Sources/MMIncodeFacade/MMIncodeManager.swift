@@ -19,7 +19,6 @@ final public class MMIncodeManager {
     
     private var signatureFeature: MMSignature!
     public var onFinishFlow = PassthroughSubject<FlowStatus, Never>()
-    var cancellables = Set<AnyCancellable>()
     var isActiveFLow = false
     
     // ---------------------------------------------------------------------
