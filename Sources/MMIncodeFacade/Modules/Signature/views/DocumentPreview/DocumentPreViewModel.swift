@@ -9,8 +9,25 @@ import Foundation
 
 class DocumentPreViewModel: ObservableObject {
     
+    // ---------------------------------------------------------------------
+    // MARK: Publisers
+    // ---------------------------------------------------------------------
+    
     @Published var documents: [DocumentModel]
     @Published var currentDocument: DocumentModel?
+    
+    // ---------------------------------------------------------------------
+    // MARK: Constructor
+    // ---------------------------------------------------------------------
+    
+    init(documents: [DocumentModel]) {
+        self.documents = documents
+        self.currentDocument = documents.first
+    }
+    
+    // ---------------------------------------------------------------------
+    // MARK: Helper vars
+    // ---------------------------------------------------------------------
     
     var currentURL: URL {
         guard let urlString = currentDocument?.urlString,
@@ -20,10 +37,9 @@ class DocumentPreViewModel: ObservableObject {
         return url
     }
     
-    init(documents: [DocumentModel]) {
-        self.documents = documents
-        self.currentDocument = documents.first
-    }
+    // ---------------------------------------------------------------------
+    // MARK: Helper funcs
+    // ---------------------------------------------------------------------
     
     func isLastItem() -> Bool {
         documents.last?.urlString == currentURL.absoluteString
