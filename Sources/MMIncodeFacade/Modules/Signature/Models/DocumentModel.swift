@@ -15,7 +15,7 @@ public struct DocumentModel {
     // ---------------------------------------------------------------------
     
     let title: String
-    let urlString: String
+    public let urlString: String
     
     // ---------------------------------------------------------------------
     // MARK: Constructor

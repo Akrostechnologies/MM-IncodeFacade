@@ -5,7 +5,6 @@
 //  Created by Andres Lozano on 9/05/23.
 //
 
-import SwiftUI
 import Combine
 import IncdOnboarding
 
@@ -15,9 +14,11 @@ final class MMSignature {
     // MARK: Properties
     // ---------------------------------------------------------------------
     
+    let item: SignatureModel
     private let flowConfiguration: IncdOnboardingFlowConfiguration
-    private let item: SignatureModel
-    private lazy var container = IncodeContainerView()
+    private lazy var container: IncodeContainerView = {
+        return IncodeContainerView { IncdOnboardingManager.shared.presentingViewController = $0 }
+    }()
     
     // ---------------------------------------------------------------------
     // MARK: Constructor
@@ -33,8 +34,8 @@ final class MMSignature {
     // MARK: Helper vars
     // ---------------------------------------------------------------------
     
-    var containerView: some View {
-        container
+    var containerView: IncodeContentView {
+        .init(incodeView: container)
     }
     
     // ---------------------------------------------------------------------
@@ -57,7 +58,7 @@ final class MMSignature {
             title: item.title,
             description: item.description,
             descriptionMaxLines: item.maxlinesDescription,
-            documents: item.documents.toSignDocuments()
+            documents: [] //item.documents.toSignDocuments()
         )
     }
 }

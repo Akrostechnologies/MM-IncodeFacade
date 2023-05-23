@@ -5,12 +5,12 @@
 //  Created by Andres Lozano on 9/05/23.
 //
 
-import Foundation
 import SwiftUI
 import UIKit
-import IncdOnboarding
 
 struct IncodeContainerView: UIViewControllerRepresentable {
+    
+    var onPresentingViewController: ((UIViewController) -> Void)?
     
     // ---------------------------------------------------------------------
     // MARK: UIViewControllerRepresentable
@@ -21,7 +21,7 @@ struct IncodeContainerView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        IncdOnboardingManager.shared.presentingViewController = uiViewController
+        onPresentingViewController?(uiViewController)
     }
     
     public typealias UIViewControllerType = UIViewController

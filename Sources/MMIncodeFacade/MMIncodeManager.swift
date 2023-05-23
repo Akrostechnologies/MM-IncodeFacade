@@ -17,7 +17,7 @@ final public class MMIncodeManager {
     // MARK: Properties
     // ---------------------------------------------------------------------
     
-    private var signatureFeature: MMSignature?
+    private var signatureFeature: MMSignature!
     public var onFinishFlow = PassthroughSubject<FlowStatus, Never>()
     var cancellables = Set<AnyCancellable>()
     var isActiveFLow = false
@@ -74,18 +74,30 @@ final public class MMIncodeManager {
     }
     
     public func presentSignature(item: SignatureModel) -> some View {
-        guard !isActiveFLow else { return signatureFeature!.containerView }
+        guard !isActiveFLow else { return signatureFeature.containerView }
         isActiveFLow = true
-        let flowConfiguration = flowConfiguration
         signatureFeature = .init(
             flowConfiguration: flowConfiguration,
             item: item
         )
-        signatureFeature?.startSignature(
+        signatureFeature.startSignature(
             with: onboardingSessionConfiguration,
             delegate: self
         )
-        return signatureFeature!.containerView
+        return signatureFeature.containerView
+    }
+    
+    public func presentSignatureWithPreview(item: SignatureModel?) -> some View {
+        guard let item else {
+            finishFLow(with: .invalidData)
+            return AnyView(EmptyView())
+        }
+        let view = SignatureContentView(viewModel: .init(signature: item)) { [weak self] in
+            self?.presentSignature(item: item)
+        } onClose: { [weak self] in
+            self?.finishFLow(with: .userFinish)
+        }
+        return AnyView(view)
     }
 }
 
@@ -96,7 +108,7 @@ extension MMIncodeManager: IncdOnboardingDelegate {
     // MARK: IncdOnboardingDelegate
     // ---------------------------------------------------------------------
     
-    public func onSuccess() {}
+    public func onSuccess() { }
     
     public func onError(_ error: IncdOnboarding.IncdFlowError) {
         finishFLow(with: .error(message: error.description))
@@ -109,8 +121,7 @@ extension MMIncodeManager: IncdOnboardingDelegate {
     public func onSignatureCollected(_ result: SignatureFormResult) {
         
         guard let error = result.error else {
-            let items = result.signedDocuments?.toDocumentModel() ?? []
-            return finishFLow(with: .success(documents: items))
+            return finishFLow(with: .success(signature: signatureFeature.item))
         }
         
         switch error {
@@ -136,8 +147,9 @@ public extension MMIncodeManager {
     // ---------------------------------------------------------------------
     
     enum FlowStatus {
-        case success(documents: [DocumentModel])
+        case success(signature: SignatureModel)
         case userFinish
         case error(message: String)
+        case invalidData
     }
 }

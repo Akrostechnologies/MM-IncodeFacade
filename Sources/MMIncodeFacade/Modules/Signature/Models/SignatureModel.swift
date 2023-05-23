@@ -31,8 +31,8 @@ public struct SignatureModel {
         id: String = UUID().uuidString
     ) {
         self.documents = documents
-        self.title = title
-        self.description = description
+        self.title = title ?? NSLocalizedString("incdOnboarding.signature.title", comment: "")
+        self.description = description ?? NSLocalizedString("incdOnboarding.signature.description", comment: "")
         self.maxlinesDescription = maxlinesDescription
         self.id = id
     }

@@ -18,7 +18,6 @@ public struct DefaultMMTheme {
         buttonMedium: .systemFont(ofSize: 15, weight: .semibold)
     )
     
-    
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
@@ -48,7 +47,10 @@ public struct DefaultMMTheme {
                 body: defaultLabelConfiguration()
             ),
             customComponents: .init(
-                signature: .init(signatureColor: .white, canvasBorderColor: .white)
+                signature: .init(
+                    signatureColor: colors.primary.toUIColor,
+                    canvasBorderColor: colors.accent.toUIColor
+                )
             )
         )
     }
