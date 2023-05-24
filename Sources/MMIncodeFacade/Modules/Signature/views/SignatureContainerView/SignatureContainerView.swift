@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct IncodeContentView: View {
+struct SignatureContainerView: View {
     
     // ---------------------------------------------------------------------
     // MARK: Views
     // ---------------------------------------------------------------------
     
-    var incodeView: IncodeContainerView
+    var contentView: PresentingIncodeView
 
     // ---------------------------------------------------------------------
     // MARK: View
@@ -26,7 +26,7 @@ struct IncodeContentView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: DefaultMMTheme.colors.accent))
                 .scaleEffect(2)
                 .font(.system(size:8))
-            incodeView
+            contentView
         }
     }
 }

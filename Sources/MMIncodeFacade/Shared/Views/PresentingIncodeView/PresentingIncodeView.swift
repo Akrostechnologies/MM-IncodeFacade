@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-struct IncodeContainerView: UIViewControllerRepresentable {
+struct PresentingIncodeView: UIViewControllerRepresentable {
     
     var onPresentingViewController: ((UIViewController) -> Void)?
     
