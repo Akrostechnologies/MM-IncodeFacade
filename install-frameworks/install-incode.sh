@@ -7,11 +7,17 @@ run_command()
   fi
 }
 
+if [ -n "$1" ]; then
+  TAG=$1
+else
+  TAG="5.16.0-d"
+fi
+
 # remove dir IncdOnboarding-distribution
 rm -rf './IncdOnboarding-distribution'
 
 # Clone repo
-run_command 'git clone --depth 1 --branch 5.16.0-d https://github.com/Incode-Technologies-Example-Repos/IncdOnboarding-distribution.git'
+run_command "git clone --depth 1 --branch $TAG https://github.com/Incode-Technologies-Example-Repos/IncdOnboarding-distribution.git"
 
 # Remove current frameworks
 rm -rf './../Sources/Frameworks/IncdOnboarding.xcframework'
