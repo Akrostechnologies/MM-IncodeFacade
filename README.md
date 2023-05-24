@@ -86,7 +86,7 @@ struct ContentView: View {
                     .font(.title)
                     .frame(width: 200, height: 40)
             }
-        }.fullScreenCover(isPresented: $viewModel.showFirstModal, content: {
+        }.fullScreenCover(isPresented: $viewModel.showModal, content: {
             viewModel.manager.presentSignature(
                 item: viewModel.buildSignature()
             )
