@@ -80,7 +80,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             Button {
-                viewModel.showFirstModal.toggle()
+                viewModel.showModal.toggle()
             } label: {
                 Text("Tap me")
                     .font(.title)
@@ -93,6 +93,19 @@ struct ContentView: View {
         })
     }
 }
+```
+
+### Localizable strings:
+
+```swift
+"incdOnboarding.signature.signDocument.acceptButton" = "Continuar";
+"incdOnboarding.signature.btnClear" = "Borrar firma";
+"incdOnboarding.signature.signHere" = "Por favor, firme aquí";
+"incdOnboarding.global.button.done" = "Continuar";
+"incdOnboarding.signature.title" = "Firma para autorizar";
+"incdOnboarding.signature.description" = "Realiza tu firma en el recuadro para dar de alta tu cuenta.";
+"incdOnboarding.signature.preview.title" = "Autoriza tu cuenta";
+"incdOnboarding.signature.preview.description" = "Lee y firma el documento que aparece en la siguiente pantalla para autorizar tu cuenta.";
 ```
 
 
