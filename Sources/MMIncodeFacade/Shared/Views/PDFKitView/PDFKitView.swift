@@ -29,7 +29,7 @@ struct PDFKitView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> PDFView {
         let pdfView = PDFView()
-        pdfView.backgroundColor = DefaultMMTheme.colors.primary.toUIColor.withAlphaComponent(0.2)
+        pdfView.backgroundColor = DefaultMMTheme.colors.primary.toUIColor
         
         DispatchQueue.global(qos: .utility).async {
             let document =  PDFDocument(url: url)

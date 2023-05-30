@@ -73,13 +73,6 @@ struct FooterDocumentPreview: View {
         .foregroundColor(DefaultMMTheme.colors.background)
         .background(DefaultMMTheme.colors.accent)
         .cornerRadius(50)
-        
-        Button {
-            onClose?()
-        } label: {
-            Text("incdOnboarding.signature.signDocument.declineButton")
-                .foregroundColor(DefaultMMTheme.colors.accent)
-                .overlay(DefaultMMTheme.colors.accent.frame(height: 1).offset(y: 14))
-        }.padding(.bottom, 30)
+        .padding(.bottom, 30)
     }
 }
