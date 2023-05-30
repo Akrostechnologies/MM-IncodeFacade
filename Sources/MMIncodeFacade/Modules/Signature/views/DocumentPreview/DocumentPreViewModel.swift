@@ -7,7 +7,7 @@
 
 import Foundation
 
-class DocumentPreViewModel: ObservableObject {
+class DocumentPreViewModel {
     
     // ---------------------------------------------------------------------
     // MARK: Publisers

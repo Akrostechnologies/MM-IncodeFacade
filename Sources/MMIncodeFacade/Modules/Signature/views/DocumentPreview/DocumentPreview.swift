@@ -36,7 +36,8 @@ struct DocumentPreview: View {
 
     var body: some View {
         
-        VStack(spacing: 40) {
+        VStack(spacing: 20) {
+            headerView
             bodyView(url: viewModel.currentURL)
             FooterDocumentPreview(
                 isLastItem: viewModel.isLastItem(),
@@ -49,7 +50,11 @@ struct DocumentPreview: View {
         .padding(.top, 20)
         .background(DefaultMMTheme.colors.background.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
+        .navigationBarHidden(false)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) { toolbarButtons }
+        }
     }
     
     // ---------------------------------------------------------------------
@@ -67,5 +72,32 @@ struct DocumentPreview: View {
                     .shadow(color: DefaultMMTheme.colors.background, radius: 8, x: 0, y: 4)
             )
         }
+    }
+    
+    @ViewBuilder
+    var headerView: some View {
+        VStack(spacing: 16) {
+            Text("incdOnboarding.signature.preview.title")
+                .font(Font.system(size: 28, weight: .semibold))
+                .foregroundColor(DefaultMMTheme.colors.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Text("incdOnboarding.signature.preview.description")
+                .font(Font.system(size: 16, weight: .regular))
+                .foregroundColor(DefaultMMTheme.colors.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+        }
+    }
+    
+    @ViewBuilder
+    var toolbarButtons: some View {
+        Button { onClose?() } label: {
+            Image("x-mark-icon")
+                .renderingMode(.template)
+                .resizable(capInsets: .init(top: 0, leading: 0, bottom: 0, trailing: 0), resizingMode: .stretch)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 17, height: 34)
+        }.foregroundColor(DefaultMMTheme.colors.accent)
     }
 }
