@@ -86,7 +86,6 @@ struct DocumentPreview: View {
                 .font(Font.system(size: 16, weight: .regular))
                 .foregroundColor(DefaultMMTheme.colors.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            
         }
     }
     
