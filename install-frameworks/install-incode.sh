@@ -25,7 +25,7 @@ rm -rf './../Sources/Frameworks/opencv2.xcframework'
 
 # Move frameworks to Resources folder
 mv './IncdOnboarding-distribution/IncdOnboarding.xcframework' './../Sources/Frameworks'
-mv './IncdOnboarding-distribution/opencv2.xcframework' './../Sources/Frameworks'
+# mv './IncdOnboarding-distribution/opencv2.xcframework' './../Sources/Frameworks'
 
 # Remove folder
 rm -rf './IncdOnboarding-distribution'

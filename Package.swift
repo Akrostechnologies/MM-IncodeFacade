@@ -11,7 +11,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "MMIncodeFacade",
-            targets: ["IncdOnboarding", "opencv2", "MMIncodeFacade"]),
+            targets: ["MMIncodeFacade"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,13 +24,9 @@ let package = Package(
             name: "IncdOnboarding",
             path: "Sources/Frameworks/IncdOnboarding.xcframework"
         ),
-        .binaryTarget(
-            name: "opencv2",
-            path: "Sources/Frameworks/opencv2.xcframework"
-        ),
         .target(
             name: "MMIncodeFacade",
-            dependencies: []
+            dependencies: ["IncdOnboarding"]
         ),
         .testTarget(
             name: "MMIncodeFacadeTests",
