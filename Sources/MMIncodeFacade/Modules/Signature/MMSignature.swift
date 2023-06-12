@@ -15,7 +15,7 @@ final class MMSignature {
     
     let item: SignatureModel
     private let flowConfiguration: IncdOnboardingFlowConfiguration
-    private lazy var contentView = PresentingIncodeView {
+    lazy var containerView = PresentingIncodeView {
         IncdOnboardingManager.shared.presentingViewController = $0
     }
     
@@ -27,14 +27,6 @@ final class MMSignature {
         self.flowConfiguration = flowConfiguration
         self.item = item
         setup()
-    }
-    
-    // ---------------------------------------------------------------------
-    // MARK: Helper vars
-    // ---------------------------------------------------------------------
-    
-    var containerView: SignatureContainerView {
-        .init(contentView: contentView)
     }
     
     // ---------------------------------------------------------------------

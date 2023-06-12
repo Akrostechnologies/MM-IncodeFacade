@@ -1,6 +1,6 @@
 //
 //  ContainView.swift
-//  
+//
 //
 //  Created by Andres Lozano on 22/05/23.
 //
@@ -14,7 +14,8 @@ struct DocumentPreview: View {
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
-
+    
+    private let colors = DefaultMMTheme.colors
     private let radius: CGFloat = 5
     private let viewModel: DocumentPreViewModel
     private var action: CallBack?
@@ -60,32 +61,32 @@ struct DocumentPreview: View {
     // ---------------------------------------------------------------------
     // MARK: Helper views
     // ---------------------------------------------------------------------
-
+    
     @ViewBuilder
     func bodyView(url: URL) -> some View {
         GeometryReader { proxy in
             PDFKitView(showing: url)
-            .cornerRadius(radius)
-            .overlay(
-                RoundedRectangle(cornerRadius: radius)
-                    .stroke(DefaultMMTheme.colors.primary.opacity(0.4), lineWidth: 2)
-                    .shadow(color: DefaultMMTheme.colors.background, radius: 8, x: 0, y: 4)
-            )
+                .cornerRadius(radius)
+                .overlay(
+                    RoundedRectangle(cornerRadius: radius)
+                        .stroke(colors.primary.opacity(0.4), lineWidth: 2)
+                        .shadow(color: colors.background, radius: 8, x: 0, y: 4)
+                )
         }
     }
     
     @ViewBuilder
     var headerView: some View {
         VStack(spacing: 16) {
-            Text("incdOnboarding.signature.preview.title")
-                .font(Font.system(size: 28, weight: .semibold))
-                .foregroundColor(DefaultMMTheme.colors.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Text("incdOnboarding.signature.preview.description")
-                .font(Font.system(size: 16, weight: .regular))
-                .foregroundColor(DefaultMMTheme.colors.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Group {
+                Text("incdOnboarding.signature.preview.title")
+                    .font(Font.system(size: 28, weight: .semibold))
+                
+                Text("incdOnboarding.signature.preview.description")
+                    .font(Font.system(size: 16, weight: .regular))
+            }
+            .foregroundColor(colors.primary)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     
@@ -97,6 +98,6 @@ struct DocumentPreview: View {
                 .resizable(capInsets: .init(top: 0, leading: 0, bottom: 0, trailing: 0), resizingMode: .stretch)
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 17, height: 34)
-        }.foregroundColor(DefaultMMTheme.colors.accent)
+        }.foregroundColor(colors.accent)
     }
 }
