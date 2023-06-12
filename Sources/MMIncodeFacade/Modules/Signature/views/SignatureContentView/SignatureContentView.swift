@@ -45,11 +45,7 @@ struct SignatureContentView<Content: View>: View {
                     },
                     onClose: onClose
                 )
-                
-//                if viewModel.showModal { containerPresentingIncodeView }
-            }
-            
-            .onAppear { viewModel.setup() }
+            }.onAppear { viewModel.setup() }
         }.easyFullScreenCover(isPresented: $viewModel.showModal) {
             containerPresentingIncodeView
                 .alert(isPresented: $viewModel.showingAlertError) { alertError }
