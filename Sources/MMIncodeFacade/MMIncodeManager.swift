@@ -17,15 +17,16 @@ final public class MMIncodeManager {
     // MARK: Properties
     // ---------------------------------------------------------------------
     
-    private var signatureFeature: MMSignature!
-    fileprivate var isActiveFLow = false
+    fileprivate var signatureFeature: MMSignature!
+    fileprivate var signatureContentView: SignatureContentView<AnyView>!
     public var onFinishFlow = PassthroughSubject<FlowStatus, Never>()
+    var store = Set<AnyCancellable>()
     
     // ---------------------------------------------------------------------
     // MARK: Constants
     // ---------------------------------------------------------------------
     
-    public static let regionCode: String = "ALL"
+    public static var regionCode: String = "ALL"
     private let dispatchGroup = DispatchGroup()
     
     // ---------------------------------------------------------------------
@@ -48,7 +49,7 @@ final public class MMIncodeManager {
     private var onboardingSessionConfiguration: IncdOnboardingSessionConfiguration {
         IncdOnboardingSessionConfiguration(
             regionCode: Self.regionCode,
-            queue: IncdOnboardingManager.shared.queue
+            queue: .defaultQueue
         )
     }
     
@@ -63,17 +64,25 @@ final public class MMIncodeManager {
     public func presentSignature(item: SignatureModel?) -> some View {
         let emptyView = AnyView(EmptyView())
         guard let item else {
-            finishFLow(with: .invalidData)
+            finishFlow(with: .invalidData)
             return emptyView
         }
-        guard !isActiveFLow else { return emptyView }
-        isActiveFLow = true
-        let view = SignatureContentView(viewModel: .init(signature: item)) { [weak self] in
-            self?.setupSignature(item: item)
-        } onClose: { [weak self] in
-            self?.finishFLow(with: .userFinish)
+        
+        guard signatureContentView == nil else {
+            return AnyView(signatureContentView)
         }
-        return AnyView(view)
+        
+        let vm = SignatureContentViewModel(signature: item)
+        vm.onFinishFlow
+            .sink(receiveValue: { [weak self] in self?.finishFlow(with: $0)})
+            .store(in: &store)
+        
+        signatureContentView = .init(viewModel: vm, content: { [weak self] in
+            self?.setupSignature(item: item, delegate: vm)
+        }, onClose: { [weak self] in
+            self?.finishFlow(with: .userFinish(error: nil))
+        })
+        return AnyView(signatureContentView)
     }
 }
 
@@ -92,69 +101,35 @@ extension MMIncodeManager {
             completation
         )
         IncdTheme.current = DefaultMMTheme.buildTheme()
+        IncdOnboardingManager.shared.allowUserToCancel = true
     }
     
-    fileprivate func setupSignature(item: SignatureModel) -> some View {
+    fileprivate func setupSignature(item: SignatureModel, delegate: IncdOnboardingDelegate?) -> AnyView {
         signatureFeature = .init(
             flowConfiguration: flowConfiguration,
             item: item
         )
         signatureFeature.startSignature(
             with: onboardingSessionConfiguration,
-            delegate: self
+            delegate: delegate
         )
-        return signatureFeature.containerView
-    }
-}
-
-extension MMIncodeManager: IncdOnboardingDelegate {
-    
-    // ---------------------------------------------------------------------
-    // MARK: IncdOnboardingDelegate
-    // ---------------------------------------------------------------------
-    
-    public func onSuccess() { }
-    
-    public func onError(_ error: IncdOnboarding.IncdFlowError) {
-        finishFLow(with: .error(message: error.description))
+        return AnyView(signatureFeature.containerView)
     }
     
-    public func userCancelledSession() {
-        finishFLow(with: .userFinish)
-    }
-    
-    public func onSignatureCollected(_ result: SignatureFormResult) {
-        
-        guard let error = result.error else {
-            return finishFLow(with: .success(signature: signatureFeature.item))
-        }
-        
-        switch error {
-            case .declinedToSignDocument:
-                finishFLow(with: .userFinish)
-            case .error(let error):
-                finishFLow(with: .error(message: error.description))
-            @unknown default:
-                finishFLow(with: .error(message: "Something whent wrong"))
-        }
-    }
-    
-    private func finishFLow(with status: FlowStatus) {
+    fileprivate func finishFlow(with status: FlowStatus) {
         onFinishFlow.send(status)
-        isActiveFLow = false
+        switch status {
+            case .error: break
+            default:
+                signatureContentView = nil
+                signatureFeature = nil
+        }
     }
 }
 
-public extension MMIncodeManager {
-    
-    // ---------------------------------------------------------------------
-    // MARK: Enums
-    // ---------------------------------------------------------------------
-    
-    enum FlowStatus {
-        case success(signature: SignatureModel)
-        case userFinish
-        case error(message: String)
-        case invalidData
-    }
+public enum FlowStatus {
+    case success(signature: SignatureModel)
+    case userFinish(error: String?)
+    case error(reason: String)
+    case invalidData
 }
