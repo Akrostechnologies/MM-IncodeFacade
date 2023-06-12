@@ -111,6 +111,10 @@ struct ContentView: View {
 "incdOnboarding.signature.description" = "Realiza tu firma en el recuadro para dar de alta tu cuenta.";
 "incdOnboarding.signature.preview.title" = "Autoriza tu cuenta";
 "incdOnboarding.signature.preview.description" = "Lee y firma el documento que aparece en la siguiente pantalla para autorizar tu cuenta.";
+"incdOnboarding.signature.error.title" = "Intenta de nuevo";
+"incdOnboarding.signature.error.message" = "Hubo un problema de conexión con el sistema, intenta de nuevo";
+"incdOnboarding.signature.error.firstButton" = "Intenta de nuevo";
+"incdOnboarding.signature.error.defaultButton" = "Volver";
 ```
 
 
