@@ -81,10 +81,7 @@ extension SignatureContentViewModel: IncdOnboardingDelegate {
         DispatchQueue.main.async {
             self.lastError = error.description
             self.showingAlertError = true
-            self.finishFlow(
-                with: .error(reason: error.description),
-                showModal: true
-            )
+            self.onFinishFlow.send(.error(reason: error.description))
         }
     }
     
