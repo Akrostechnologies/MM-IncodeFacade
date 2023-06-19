@@ -3,14 +3,17 @@
 // swift-module-flags: -target arm64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name IncdOnboarding
 import AVFoundation
 import AVKit
+import Accelerate
 import CommonCrypto
 import CoreData
 import CoreGraphics
 import CoreImage
 import CoreLocation
+import CoreMedia
 import CoreMotion
 import CoreNFC
 import CoreTelephony
+import CoreVideo
 import CryptoKit
 import Darwin
 import Foundation
@@ -72,6 +75,11 @@ extension IncdOnboarding.SignatureConfiguration {
   public static var localizationLanguage: Swift.String?
   @objc deinit
 }
+public struct IdOCRConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.IdOCRConfiguration, b: IncdOnboarding.IdOCRConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct IdProcessResult {
   public var ocrData: IncdOnboarding.OmniGetOCRDataResponse?
   public var extendedOcrJsonData: Foundation.Data?
@@ -84,6 +92,35 @@ public struct MockInitResponse : Swift.Decodable {
   public let uuid: Swift.String?
   public init(from decoder: Swift.Decoder) throws
 }
+public struct AntifraudResponse : Swift.Decodable {
+  public let result: IncdOnboarding.AntifraudStatus
+  public let stepName: IncdOnboarding.AntifraudStepName?
+  public init(from decoder: Swift.Decoder) throws
+}
+public enum AntifraudStatus : Swift.String, Swift.Decodable {
+  case failed
+  case passed
+  case notExecuted
+  case unknown
+  public init(from decoder: Swift.Decoder) throws
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum AntifraudStepName : Swift.String, Swift.Decodable {
+  case fuzzyFieldAntifraudExecutor
+  case idFaceAntifraudExecutor
+  case selfieFaceAntifraudExecutor
+  case unknown
+  public init(from decoder: Swift.Decoder) throws
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
 public struct OmniFlow : Swift.Codable, Swift.Equatable {
   public let id: Swift.String?
   public let apiKey: Swift.String?
@@ -91,7 +128,6 @@ public struct OmniFlow : Swift.Codable, Swift.Equatable {
   public var region: Swift.String?
   public var active: Swift.Bool?
   public let numberOfSessions: Swift.Int?
-  public var modules: [IncdOnboarding.OmniFlowsModule]?
   public let checks: [Swift.String?]?
   public let defaultConfiguration: Swift.Bool?
   public var liveness: IncdOnboarding.OmniLivenessSeverity?
@@ -105,90 +141,14 @@ public struct OmniFlow : Swift.Codable, Swift.Equatable {
   public let checkTutorials: Swift.Bool?, checkAuthorization: Swift.Bool?, checkLiveness: Swift.Bool?, checkIdScan: Swift.Bool?, checkDocumentScan: Swift.Bool?, checkFaceMask: Swift.Bool?, checkLenses: Swift.Bool?, checkVoiceConsent: Swift.Bool?
   public let companyName: Swift.String?
   public let questionsCount: Swift.String?
-  public let consents: [IncdOnboarding.OmniFlowConsents]?
   public let nfcScanConfiguration: IncdOnboarding.NFCScanConfiguration?
+  public var flowModules: [IncdOnboarding.FlowModule]?
   public var unwrappedChecks: [Swift.String]? {
     get
   }
-  public init(name: Swift.String, id: Swift.String, region: Swift.String, active: Swift.Bool, modules: [IncdOnboarding.OmniFlowsModule], liveness: IncdOnboarding.OmniLivenessSeverity)
+  public init(name: Swift.String, id: Swift.String? = nil, region: Swift.String, active: Swift.Bool, modules: [IncdOnboarding.FlowModule], liveness: IncdOnboarding.OmniLivenessSeverity)
   public func encode(to encoder: Swift.Encoder) throws
   public static func == (lhs: IncdOnboarding.OmniFlow, rhs: IncdOnboarding.OmniFlow) -> Swift.Bool
-  public init(from decoder: Swift.Decoder) throws
-}
-public struct OmniFlowsModule : Swift.Codable, Swift.Equatable {
-  public let id: Swift.String?
-  public let apiKey: Swift.String?
-  public let name: IncdOnboarding.OmniFlowModuleType?
-  public let moduleDescription: Swift.String?
-  public let videoURL: Swift.String?
-  public let categoryID: Swift.String?
-  public let conversion: Swift.Double?
-  public let security: Swift.Double?
-  public let price: Swift.Double?
-  public let active: Swift.Bool?
-  public let relatedModules: [Swift.String]?
-  public let alternativeModules: [Swift.String]?
-  public let configurations: [IncdOnboarding.OmniFlowModuleType]?
-  public let checkConfigurations: IncdOnboarding.CheckConfiguration?
-  public init(type: IncdOnboarding.OmniFlowModuleType, configurations: [IncdOnboarding.OmniFlowModuleType])
-  public func encode(to encoder: Swift.Encoder) throws
-  public static func == (lhs: IncdOnboarding.OmniFlowsModule, rhs: IncdOnboarding.OmniFlowsModule) -> Swift.Bool
-  public init(from decoder: Swift.Decoder) throws
-}
-public enum OmniFlowModuleType : Swift.String, Swift.Codable, Swift.CaseIterable {
-  case phoneCapture
-  case phone
-  case nameCapture
-  case idCaptureTutorial
-  case idCapture
-  case idValidation
-  case nfcScan
-  case videoSelfie
-  case videoSelfieAsSelfie
-  case selfie
-  case selfieTutorial
-  case ineValidation
-  case signature
-  case address
-  case conference
-  case secondID
-  case medicalCard
-  case thirdID
-  case geolocation
-  case deviceFingerprint
-  case ipAddress
-  case curpValidation
-  case ocrOnIDS
-  case userConsent
-  case email
-  case customWatchlist
-  case machineLearningConsent
-  case usMachineLearningConsent
-  case gdprMachineLearningConsent
-  case worldWideMachineLearningConsent
-  case assistedOnboarding
-  case otherDocumentCapture
-  case showResults
-  case secure
-  case medium
-  case conversion
-  case faceMatch
-  case otp
-  case results
-  case intro
-  case qrScan
-  case idProcess
-  case unsupported
-  public init(from decoder: Swift.Decoder) throws
-  public init?(rawValue: Swift.String)
-  public typealias AllCases = [IncdOnboarding.OmniFlowModuleType]
-  public typealias RawValue = Swift.String
-  public static var allCases: [IncdOnboarding.OmniFlowModuleType] {
-    get
-  }
-  public var rawValue: Swift.String {
-    get
-  }
 }
 public enum OmniLivenessSeverity : Swift.String, Swift.Codable {
   case low
@@ -220,21 +180,11 @@ public struct OmniFlowConsents : Swift.Codable, Swift.Equatable {
   public func encode(to encoder: Swift.Encoder) throws
   public init(from decoder: Swift.Decoder) throws
 }
-public struct NFCScanConfiguration : Swift.Codable, Swift.Equatable {
-  public let nfcValidation: Swift.Bool?
-  public let nfcAvailability: Swift.Bool?
-  public static func == (a: IncdOnboarding.NFCScanConfiguration, b: IncdOnboarding.NFCScanConfiguration) -> Swift.Bool
-  public func encode(to encoder: Swift.Encoder) throws
-  public init(from decoder: Swift.Decoder) throws
-}
-public struct CheckConfiguration : Swift.Codable, Swift.Equatable {
-  public let faceMatchingType: Swift.String?
-  public static func == (a: IncdOnboarding.CheckConfiguration, b: IncdOnboarding.CheckConfiguration) -> Swift.Bool
-  public func encode(to encoder: Swift.Encoder) throws
-  public init(from decoder: Swift.Decoder) throws
-}
 extension IncdOnboarding.FaceMatchType {
   public init(urlKey: Swift.String)
+}
+extension IncdOnboarding.OmniFlow {
+  public init(from decoder: Swift.Decoder) throws
 }
 public enum RegulationType : Swift.Codable, Swift.CustomStringConvertible {
   case us
@@ -275,6 +225,28 @@ public struct OmniGetOCRDataResult {
   public var error: IncdOnboarding.IncdError?
   public init(ocrData: IncdOnboarding.OmniGetOCRDataResponse? = nil, extendedJsonData: Foundation.Data? = nil, error: IncdOnboarding.IncdError? = nil)
 }
+public struct ExternalVerificationEkybConfiguration : Swift.Equatable, Swift.Codable {
+  public let checkBusinessName: Swift.Bool?
+  public let businessNameSource: Swift.String?
+  public let checkAddress1: Swift.Bool?
+  public let address1Source: Swift.String?
+  public let checkAddress2: Swift.Bool?
+  public let address2Source: Swift.String?
+  public let checkCity: Swift.Bool?
+  public let citySource: Swift.String?
+  public let checkState: Swift.Bool?
+  public let stateSource: Swift.String?
+  public let checkPostalCode: Swift.Bool?
+  public let postalCodeSource: Swift.String?
+  public let checkTaxId: Swift.Bool?
+  public let taxIdSource: Swift.String?
+  public let checkCountry: Swift.Bool?
+  public let countrySource: Swift.String?
+  public init(checkBusinessName: Swift.Bool?, businessNameSource: Swift.String?, checkAddress1: Swift.Bool?, address1Source: Swift.String?, checkAddress2: Swift.Bool?, address2Source: Swift.String?, checkCity: Swift.Bool?, citySource: Swift.String?, checkState: Swift.Bool?, stateSource: Swift.String?, checkPostalCode: Swift.Bool?, postalCodeSource: Swift.String?, checkTaxId: Swift.Bool?, taxIdSource: Swift.String?, checkCountry: Swift.Bool?, countrySource: Swift.String?)
+  public static func == (a: IncdOnboarding.ExternalVerificationEkybConfiguration, b: IncdOnboarding.ExternalVerificationEkybConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct OmniGetMedicalOCRDataResponse : Swift.Decodable {
   public let name: Swift.String?
   public let mentions: Swift.String?
@@ -292,6 +264,18 @@ public struct SeparatorConfiguration : Swift.Decodable {
 }
 extension IncdOnboarding.SeparatorConfiguration {
   public static let defaultSeparatorConfiguration: IncdOnboarding.SeparatorConfiguration
+}
+public struct ExternalVerificationConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.ExternalVerificationConfiguration, b: IncdOnboarding.ExternalVerificationConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
+public struct NFCScanConfiguration : Swift.Codable, Swift.Equatable {
+  public let nfcValidation: Swift.Bool?
+  public let nfcAvailability: Swift.Bool?
+  public static func == (a: IncdOnboarding.NFCScanConfiguration, b: IncdOnboarding.NFCScanConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public struct OmniGetFaceTemplateResponse : Swift.Decodable {
   public let template: Swift.String?
@@ -317,7 +301,7 @@ public enum OmniOrigin : Swift.String, Swift.Decodable {
     get
   }
 }
-public enum FaceMatchType : Swift.String {
+public enum FaceMatchType : Swift.String, Swift.Codable {
   case idSelfie
   case nfcSelfie
   case nfc3Way
@@ -326,6 +310,15 @@ public enum FaceMatchType : Swift.String {
   public var rawValue: Swift.String {
     get
   }
+}
+public struct AntifraudResult {
+  public var response: IncdOnboarding.AntifraudResponse?
+  public var error: IncdOnboarding.IncdError?
+}
+public struct IdValidationConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.IdValidationConfiguration, b: IncdOnboarding.IdValidationConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public struct Result : Swift.Decodable {
   public let value: Swift.String?
@@ -524,10 +517,23 @@ public struct ThemeConfiguration : Swift.Decodable {
 extension IncdOnboarding.ThemeConfiguration {
   public static let defaultThemeConfiguration: IncdOnboarding.ThemeConfiguration
 }
+public enum LocalFlowModuleBuilder {
+  public static var idModuleTypes: [IncdOnboarding.FlowModule] {
+    get
+  }
+  public static var qrModuleTypes: [IncdOnboarding.FlowModule] {
+    get
+  }
+  public static var defaultFlow: IncdOnboarding.OmniFlow {
+    get
+  }
+}
 @_hasMissingDesignatedInitializers public class IncdOnboardingManager {
   public static let shared: IncdOnboarding.IncdOnboardingManager
   weak public var presentingViewController: UIKit.UIViewController?
   public var dismissOnCompletion: Swift.Bool
+  public var enableExternalScreenshots: Swift.Bool
+  public var externalAnalyticsEnabled: Swift.Bool
   @available(*, deprecated, message: "Use `IncdLocalization.localizationBundle` instead.")
   public var localizationBundle: Foundation.Bundle? {
     get
@@ -611,6 +617,9 @@ public enum Event : Swift.String, Swift.Encodable {
   case screenClosed
   case moduleOpened
   case moduleClosed
+  case frontIdScanScreenRecordVideoUploaded
+  case backIdScanScreenRecordVideoUploaded
+  case selfieScanScreenRecordVideoUploaded
   case nfcOcrInfoUpdated
   case nfcSymbolCheckBtnNo
   case nfcSymbolCheckBtnYes
@@ -628,17 +637,17 @@ public class IncdOnboardingFlowConfiguration {
   public init(waitForTutorials: Swift.Bool)
   public init()
   public func addIntro(checks: [IncdOnboarding.IntroCheck])
-  public func addPhone()
+  public func addPhone(otpVerification: Swift.Bool = IncdOnboardingManager.shared.enableSMSOTPVerification)
   public func addBarcodeScan(showTutorials: Swift.Bool = false)
   public func addFullName()
-  public func addEmail()
-  public func addIdScan(idType: IncdOnboarding.IdType? = nil, scanStep: IncdOnboarding.ScanStep = .both, idCategory: IncdOnboarding.IDCategory = .primary, showTutorials: Swift.Bool? = nil, showRetakeScreen: Swift.Bool? = nil, showAutoCaptureRetakeScreen: Swift.Bool? = nil, enableRotationOnRetakeScreen: Swift.Bool? = nil, autocaptureUxMode: IncdOnboarding.AutocaptureUxMode? = nil, showIDOverlay: Swift.Bool? = nil)
+  public func addEmail(otpVerification: Swift.Bool = IncdOnboardingManager.shared.enableEmailOTPVerification)
+  public func addIdScan(idType: IncdOnboarding.IdType? = nil, scanStep: IncdOnboarding.ScanStep = .both, idCategory: IncdOnboarding.IDCategory = .primary, showTutorials: Swift.Bool? = nil, showRetakeScreen: Swift.Bool? = nil, showAutoCaptureRetakeScreen: Swift.Bool? = nil, enableRotationOnRetakeScreen: Swift.Bool? = nil, autocaptureUxMode: IncdOnboarding.AutocaptureUxMode? = nil, showIDOverlay: Swift.Bool? = nil, streamFrames: Swift.Bool? = nil)
   public func addIdProcess(idCategory: IncdOnboarding.IDCategory = .primary, enableIdSummaryScreen: Swift.Bool? = nil)
   public func addQRScan(showTutorials: Swift.Bool? = nil)
   public func addDocumentScan(showTutorials: Swift.Bool? = nil, showDocumentProviderOptions: Swift.Bool? = nil, documentType: IncdOnboarding.DocumentType, showRetakeScreen: Swift.Bool? = nil)
   public func addCreditCardCCV()
   public func addGeolocation()
-  public func addSelfieScan(showTutorials: Swift.Bool? = nil, lensesCheck: Swift.Bool? = nil, faceMaskCheck: Swift.Bool? = nil, brightnessThreshold: Swift.Float? = nil, cameraFacing: IncdOnboarding.CameraFacing? = nil)
+  public func addSelfieScan(showTutorials: Swift.Bool? = nil, lensesCheck: Swift.Bool? = nil, faceMaskCheck: Swift.Bool? = nil, brightnessThreshold: Swift.Float? = nil, cameraFacing: IncdOnboarding.CameraFacing? = nil, streamFrames: Swift.Bool? = nil)
   public func addFaceMatch(matchType: IncdOnboarding.FaceMatchType? = nil, uiFlavor: IncdOnboarding.UIFlavor? = nil, idCategory: IncdOnboarding.IDCategory? = nil, showUserExists: Swift.Bool? = nil)
   public func addGovernmentValidation()
   public func addCURPValidation(validationEnabled: Swift.Bool? = nil)
@@ -652,6 +661,7 @@ public class IncdOnboardingFlowConfiguration {
   public func addCustomWatchlist()
   public func addMachineLearningConsent(type: IncdOnboarding.RegulationType)
   public func recordSession(forcePermission: Swift.Bool)
+  public func addAntifraud()
   @objc deinit
 }
 @_hasMissingDesignatedInitializers public class IncdTheme {
@@ -829,6 +839,11 @@ public enum SignatureError {
     get
   }
 }
+public struct IneValidationConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.IneValidationConfiguration, b: IncdOnboarding.IneValidationConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct UserScore {
   public let idValidation: IncdOnboarding.IDValidation?
   public let liveness: IncdOnboarding.Liveness?
@@ -889,6 +904,7 @@ public struct IdScanResult {
 @frozen public enum IdType {
   case id
   case passport
+  public init?(enableId: Swift.Bool?, enablePassport: Swift.Bool?)
   public static func == (a: IncdOnboarding.IdType, b: IncdOnboarding.IdType) -> Swift.Bool
   public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
@@ -1089,6 +1105,22 @@ extension IncdOnboarding.ButtonConfiguration {
   public static let defaultTextButtonConfiguration: IncdOnboarding.ButtonConfiguration
   public static let defaultHelpButtonConfiguration: IncdOnboarding.ButtonConfiguration
 }
+public enum MLConsentType : Swift.String, Swift.Codable, Swift.Equatable {
+  case us
+  case worldwide
+  case gdpr
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct MLConsentConfiguration : Swift.Equatable, Swift.Codable {
+  public let consentType: IncdOnboarding.MLConsentType
+  public static func == (a: IncdOnboarding.MLConsentConfiguration, b: IncdOnboarding.MLConsentConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public enum UserScoreFetchMode : Swift.Int, Swift.CaseIterable {
   case accurate
   case fast
@@ -1132,10 +1164,27 @@ extension IncdOnboarding.LabelConfiguration {
   public static let defaultSecondaryBody: IncdOnboarding.LabelConfiguration
   public static let defaultCode: IncdOnboarding.LabelConfiguration
 }
+public struct IdCaptureConfiguration : Swift.Equatable, Swift.Codable {
+  public let showTutorial: Swift.Bool?
+  public let secondId: Swift.Bool?
+  public let enableId: Swift.Bool?
+  public let enablePassport: Swift.Bool?
+  public let enableIdRecording: Swift.Bool?
+  public static func == (a: IncdOnboarding.IdCaptureConfiguration, b: IncdOnboarding.IdCaptureConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 @frozen public struct UserNameInfoResult {
   public var name: Swift.String?
   public var error: IncdOnboarding.IncdError?
   public init(name: Swift.String? = nil, error: IncdOnboarding.IncdError? = nil)
+}
+public struct EkybResult {
+  public let error: IncdOnboarding.IncdError?
+  public var externalVerification: [IncdOnboarding.EkybVerificationStep]?
+  public init(externalVerification: [IncdOnboarding.EkybVerificationStep]? = [], error: IncdOnboarding.IncdError? = nil)
+}
+public struct EkybVerificationStep {
 }
 public enum SDKMode : Swift.Int {
   case standard
@@ -1181,6 +1230,7 @@ public enum IncdError : Swift.Equatable {
   case noActiveSession
   case jailbreakDetected
   case apiKeyRevoked(key: Swift.String?)
+  case sslPinningFailed
   public var description: Swift.String {
     get
   }
@@ -1222,6 +1272,10 @@ public enum OnboardingSessionError {
     get
   }
 }
+public struct InterviewEventSingleResponse : Swift.Decodable {
+  public let id: Swift.String
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct ButtonSizeVariant : Swift.Decodable {
   public var height: CoreGraphics.CGFloat
   public var minWidth: CoreGraphics.CGFloat
@@ -1235,6 +1289,22 @@ extension IncdOnboarding.ButtonSizeVariant {
   public static let defaultMediumSizeVariant: IncdOnboarding.ButtonSizeVariant
   public static let defaultTextBigSizeVariant: IncdOnboarding.ButtonSizeVariant
   public static let defaultTextMediumSizeVariant: IncdOnboarding.ButtonSizeVariant
+}
+public struct VideoOnboardingConfiguration : Swift.Equatable, Swift.Codable {
+  public let useAsSelfie: Swift.Bool?
+  public let checkIdScan: Swift.Bool?
+  public let checkDocumentScan: Swift.Bool?
+  public let checkVoiceConsent: Swift.Bool?
+  public let voiceConsentQuestions: Swift.Int?
+  public let showTutorials: Swift.Bool?
+  public let authorizationScreen: Swift.Bool?
+  public let companyName: Swift.String?
+  public let checkLiveness: Swift.Bool?
+  public let compareIdEnabled: Swift.Bool?
+  public let compareOcrEnabled: Swift.Bool?
+  public static func == (a: IncdOnboarding.VideoOnboardingConfiguration, b: IncdOnboarding.VideoOnboardingConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public protocol IncdOnboardingManagerAPI {
   func initIncdOnboarding(url: Swift.String?, apiKey: Swift.String?, loggingEnabled: Swift.Bool, testMode: Swift.Bool, _ completion: ((_ success: Swift.Bool?, _ error: IncdOnboarding.IncdInitError?) -> Swift.Void)?)
@@ -1255,8 +1325,10 @@ public protocol IncdOnboardingManagerAPI {
   func processLaborHistory(curp: Swift.String, interviewId: Swift.String?, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   func processPaymentProof(interviewId: Swift.String?, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   func processCustomWatchlist(interviewId: Swift.String?, completion: @escaping (_ result: IncdOnboarding.CustomWatchlistResult) -> Swift.Void)
+  func antifraudCheck(completion: @escaping (_ result: IncdOnboarding.AntifraudResult?) -> Swift.Void)
   func addNOM151Archive(interviewId: Swift.String?, completion: @escaping (_ result: IncdOnboarding.AddNOM151Result) -> Swift.Void)
   func getUserOCRData(_ token: Swift.String?, completion: @escaping (_ result: IncdOnboarding.OmniGetOCRDataResult) -> Swift.Void)
+  func configureSSLPinning(enabled: Swift.Bool?, forced: Swift.Bool?)
 }
 extension IncdOnboarding.IncdOnboardingManagerAPI {
   public func initIncdOnboarding(url: Swift.String?, apiKey: Swift.String?, loggingEnabled: Swift.Bool, testMode: Swift.Bool, _ completion: ((_ success: Swift.Bool?, _ error: IncdOnboarding.IncdInitError?) -> Swift.Void)?)
@@ -1277,6 +1349,7 @@ extension IncdOnboarding.IncdOnboardingManagerAPI {
   public func processLaborHistory(curp: Swift.String, interviewId: Swift.String?, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   public func processPaymentProof(interviewId: Swift.String? = nil, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   public func processCustomWatchlist(interviewId: Swift.String?, completion: @escaping (_ result: IncdOnboarding.CustomWatchlistResult) -> Swift.Void)
+  public func antifraudCheck(completion: @escaping (_ result: IncdOnboarding.AntifraudResult?) -> Swift.Void)
   public func addNOM151Archive(interviewId: Swift.String?, completion: @escaping (_ result: IncdOnboarding.AddNOM151Result) -> Swift.Void)
   public func getUserOCRData(_ token: Swift.String?, completion: @escaping (_ result: IncdOnboarding.OmniGetOCRDataResult) -> Swift.Void)
 }
@@ -1297,6 +1370,7 @@ public protocol IncdOnboardingDelegate : AnyObject {
   func onDocumentScanCompleted(_ result: IncdOnboarding.DocumentScanResult)
   func onCreditCardCCVCompleted(_ result: IncdOnboarding.CreditCardCCVResult)
   func onGeolocationCompleted(_ result: IncdOnboarding.GeolocationResult)
+  func onAntifraudCompleted(_ result: IncdOnboarding.AntifraudResult)
   func onSelfieScanCompleted(_ result: IncdOnboarding.SelfieScanResult)
   func onFaceMatchCompleted(_ result: IncdOnboarding.FaceMatchResult)
   func onGovernmentValidationCompleted(_ result: IncdOnboarding.GovernmentValidationResult)
@@ -1313,9 +1387,11 @@ public protocol IncdOnboardingDelegate : AnyObject {
   func onVideoSelfieCompleted(_ result: IncdOnboarding.VideoSelfieResult)
   func onCustomWatchlistCompleted(_ result: IncdOnboarding.CustomWatchlistResult)
   func onMachineLearningConsentCompleted(_ result: IncdOnboarding.MachineLearningConsentResult)
+  func onExternalValidationEkybCompleted(_ result: IncdOnboarding.EkybResult)
   func onEvents(_ eventsWithDetails: [Self.EventWithDetails])
   func onSuccess()
   func onError(_ error: IncdOnboarding.IncdFlowError)
+  func onSSLPinningFailed()
 }
 extension IncdOnboarding.IncdOnboardingDelegate {
   public func userCancelledSession()
@@ -1345,10 +1421,13 @@ extension IncdOnboarding.IncdOnboardingDelegate {
   public func onVideoSelfieCompleted(_ result: IncdOnboarding.VideoSelfieResult)
   public func onCustomWatchlistCompleted(_ result: IncdOnboarding.CustomWatchlistResult)
   public func onMachineLearningConsentCompleted(_ result: IncdOnboarding.MachineLearningConsentResult)
+  public func onExternalValidationEkybCompleted(_ result: IncdOnboarding.EkybResult)
   public func onQueuePositionChanged(_ newQueuePosition: Swift.Int)
   public func onEstimatedWaitingTime(_ waitingTimeInSeconds: Swift.Int)
   public func onOnboardingSectionCompleted(_ flowTag: Swift.String)
   public func onEvents(_ eventsWithDetails: [Self.EventWithDetails])
+  public func onAntifraudCompleted(_ result: IncdOnboarding.AntifraudResult)
+  public func onSSLPinningFailed()
 }
 public struct IDSideLabelConfiguration : Swift.Decodable {
   public var alpha: CoreGraphics.CGFloat
@@ -1407,6 +1486,13 @@ extension IncdOnboarding.ButtonThemedState {
   public static let highlightedHelpButtonThemedState: IncdOnboarding.ButtonThemedState
   public static let disabledHelpButtonThemedState: IncdOnboarding.ButtonThemedState
 }
+public struct OTPConfiguration : Swift.Equatable, Swift.Codable {
+  public let otpExpirationInMinutes: Swift.Int?
+  public let otpVerification: Swift.Bool?
+  public static func == (a: IncdOnboarding.OTPConfiguration, b: IncdOnboarding.OTPConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct IDAutocaptureCountdownConfiguration {
   public var backgroundColor: UIKit.UIColor
   public var numberColor: UIKit.UIColor
@@ -1444,8 +1530,10 @@ extension IncdOnboarding.IncdOnboardingManager {
   public func processLaborHistory(curp: Swift.String, interviewId: Swift.String? = nil, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   public func processPaymentProof(interviewId: Swift.String? = nil, completion: @escaping (_ success: Swift.Bool?, _ error: IncdOnboarding.IncdError?) -> Swift.Void)
   public func processCustomWatchlist(interviewId: Swift.String? = nil, completion: @escaping (_ result: IncdOnboarding.CustomWatchlistResult) -> Swift.Void)
+  public func antifraudCheck(completion: @escaping (IncdOnboarding.AntifraudResult?) -> Swift.Void)
   public func addNOM151Archive(interviewId: Swift.String? = nil, completion: @escaping (_ result: IncdOnboarding.AddNOM151Result) -> Swift.Void)
   public func loadModels()
+  public func configureSSLPinning(enabled: Swift.Bool?, forced: Swift.Bool?)
 }
 public class IncdDefaults {
   public init()
@@ -1505,6 +1593,51 @@ public struct SignaturePosition : Swift.Codable {
   public func encode(to encoder: Swift.Encoder) throws
   public init(from decoder: Swift.Decoder) throws
 }
+public enum FlowModule : Swift.Equatable {
+  case idCapture(IncdOnboarding.IdCaptureConfiguration)
+  case idValidation(IncdOnboarding.IdValidationConfiguration)
+  case idOCR(IncdOnboarding.IdOCRConfiguration)
+  case selfie(IncdOnboarding.SelfieConfiguration)
+  case faceMatch(IncdOnboarding.FaceMatchConfiguration)
+  case videoSelfie(IncdOnboarding.VideoOnboardingConfiguration)
+  case nameCapture
+  case email(IncdOnboarding.OTPConfiguration)
+  case phoneNumberInput(IncdOnboarding.OTPConfiguration)
+  case signature
+  case documentCapture(IncdOnboarding.DocumentCaptureConfiguration)
+  case poaCapture(IncdOnboarding.POACaptureConfiguration)
+  case userConsent(IncdOnboarding.UserConsentConfiguration)
+  case machineLearningConsent(IncdOnboarding.MLConsentConfiguration)
+  case externalVerification(IncdOnboarding.ExternalVerificationConfiguration)
+  case geolocation
+  case customWatchlist
+  case CURP
+  case conference(IncdOnboarding.VideoConferenceConfiguration)
+  case showResults
+  case smsOTP
+  case nfcScan(IncdOnboarding.NFCScanConfiguration)
+  case ineValidation(IncdOnboarding.IneValidationConfiguration)
+  case antifraud(IncdOnboarding.AntifraudConfiguration)
+  case ekyb(IncdOnboarding.ExternalVerificationEkybConfiguration)
+  case approval
+  case intro
+  case qrScan
+  public static var titles: [Swift.String] {
+    get
+  }
+  public static func compare(module: IncdOnboarding.FlowModule, to: IncdOnboarding.FlowModule) -> Swift.Bool
+  public static func titleToModule(title: Swift.String) -> IncdOnboarding.FlowModule?
+  public static func == (a: IncdOnboarding.FlowModule, b: IncdOnboarding.FlowModule) -> Swift.Bool
+}
+extension IncdOnboarding.FlowModule : Swift.Decodable {
+  public init(from decoder: Swift.Decoder) throws
+}
+extension IncdOnboarding.FlowModule : Swift.Encodable {
+  public func encode(to encoder: Swift.Encoder) throws
+  public var displayTitle: Swift.String {
+    get
+  }
+}
 extension IncdOnboarding.IncdOnboardingManager {
   public var forceApproval: Swift.Bool {
     get
@@ -1543,6 +1676,10 @@ extension IncdOnboarding.IncdOnboardingManager {
     set
   }
   public var recordSessionForcePermission: Swift.Bool {
+    get
+    set
+  }
+  public var streamFrames: Swift.Bool {
     get
     set
   }
@@ -1726,6 +1863,14 @@ extension IncdOnboarding.IncdOnboardingManager {
     get
     set
   }
+  public var enableSMSOTPVerification: Swift.Bool {
+    get
+    set
+  }
+  public var enableEmailOTPVerification: Swift.Bool {
+    get
+    set
+  }
   public var disableMicOnCallStarted: Swift.Bool {
     get
     set
@@ -1756,6 +1901,16 @@ extension IncdOnboarding.IncdOnboardingManager {
   }
   public func loadDefaultConfiguration()
 }
+public struct SelfieConfiguration : Swift.Equatable, Swift.Codable {
+  public let assistedOnboarding: Swift.Bool?
+  public let showTutorial: Swift.Bool?
+  public let enableFaceRecording: Swift.Bool?
+  public let validateLenses: Swift.Bool?
+  public let validateFaceMask: Swift.Bool?
+  public static func == (a: IncdOnboarding.SelfieConfiguration, b: IncdOnboarding.SelfieConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public enum IDCaptureMode : Swift.Int {
   case fullIdCapture
   case qrCapture
@@ -1768,6 +1923,16 @@ public enum IDCaptureMode : Swift.Int {
     get
   }
 }
+public struct DocumentCaptureConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.DocumentCaptureConfiguration, b: IncdOnboarding.DocumentCaptureConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
+public struct AntifraudConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.AntifraudConfiguration, b: IncdOnboarding.AntifraudConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct ButtonsConfiguration : Swift.Decodable {
   public var primary: IncdOnboarding.ButtonConfiguration
   public var secondary: IncdOnboarding.ButtonConfiguration
@@ -1778,6 +1943,11 @@ public struct ButtonsConfiguration : Swift.Decodable {
 }
 extension IncdOnboarding.ButtonsConfiguration {
   public static let defaultButtonsConfiguration: IncdOnboarding.ButtonsConfiguration
+}
+public struct POACaptureConfiguration : Swift.Equatable, Swift.Codable {
+  public static func == (a: IncdOnboarding.POACaptureConfiguration, b: IncdOnboarding.POACaptureConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public struct BarcodeScanResult {
   public var barcodeContent: Swift.String?
@@ -1820,13 +1990,6 @@ public struct NFCDataModel : Swift.Codable {
     public func encode(to encoder: Swift.Encoder) throws
     public init(from decoder: Swift.Decoder) throws
   }
-  public struct DG2 : Swift.Codable {
-    public let faceFromNFC: Swift.String?
-    public func encode(to encoder: Swift.Encoder) throws
-    public init(from decoder: Swift.Decoder) throws
-  }
-  public let dg1: IncdOnboarding.NFCDataModel.DG1
-  public let dg2: IncdOnboarding.NFCDataModel.DG2
   public func encode(to encoder: Swift.Encoder) throws
   public init(from decoder: Swift.Decoder) throws
 }
@@ -1835,10 +1998,22 @@ extension Swift.Array {
     get
   }
 }
+public struct FaceMatchConfiguration : Swift.Equatable, Swift.Codable {
+  public let matchingType: IncdOnboarding.FaceMatchType?
+  public static func == (a: IncdOnboarding.FaceMatchConfiguration, b: IncdOnboarding.FaceMatchConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
+}
 public struct CreditCardCCVResult {
   public var ccv: Swift.String?
   public var error: IncdOnboarding.IncdError?
   public init(ccv: Swift.String? = nil, error: IncdOnboarding.IncdError? = nil)
+}
+public struct UserConsentConfiguration : Swift.Equatable, Swift.Codable {
+  public let title: Swift.String?, text: Swift.String?
+  public static func == (a: IncdOnboarding.UserConsentConfiguration, b: IncdOnboarding.UserConsentConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public class SignDocument {
   final public let title: Swift.String
@@ -1846,6 +2021,12 @@ public class SignDocument {
   final public let signaturePositions: [IncdOnboarding.SignaturePosition]
   public init(title: Swift.String, fileURL: Foundation.URL, signaturePositions: [IncdOnboarding.SignaturePosition])
   @objc deinit
+}
+public struct VideoConferenceConfiguration : Swift.Codable, Swift.Equatable {
+  public let enableConferenceOtp: Swift.Bool?
+  public static func == (a: IncdOnboarding.VideoConferenceConfiguration, b: IncdOnboarding.VideoConferenceConfiguration) -> Swift.Bool
+  public func encode(to encoder: Swift.Encoder) throws
+  public init(from decoder: Swift.Decoder) throws
 }
 public struct CameraFeedbackConfiguration : Swift.Decodable {
   public var alpha: CoreGraphics.CGFloat
@@ -1971,6 +2152,16 @@ extension UIKit.UIFont {
     get
   }
 }
+public enum Severity : Swift.String, Swift.Codable {
+  case low
+  case medium
+  case high
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
 public struct CustomComponentsConfiguration : Swift.Decodable {
   public var cameraFeedback: IncdOnboarding.CameraFeedbackConfiguration
   public var idCaptureHelp: IncdOnboarding.IDCaptureHelpConfiguration
@@ -2040,9 +2231,12 @@ extension IncdOnboarding.FaceInfoMO {
 extension IncdOnboarding.UIFlavor : Swift.Equatable {}
 extension IncdOnboarding.UIFlavor : Swift.Hashable {}
 extension IncdOnboarding.UIFlavor : Swift.RawRepresentable {}
-extension IncdOnboarding.OmniFlowModuleType : Swift.Equatable {}
-extension IncdOnboarding.OmniFlowModuleType : Swift.Hashable {}
-extension IncdOnboarding.OmniFlowModuleType : Swift.RawRepresentable {}
+extension IncdOnboarding.AntifraudStatus : Swift.Equatable {}
+extension IncdOnboarding.AntifraudStatus : Swift.Hashable {}
+extension IncdOnboarding.AntifraudStatus : Swift.RawRepresentable {}
+extension IncdOnboarding.AntifraudStepName : Swift.Equatable {}
+extension IncdOnboarding.AntifraudStepName : Swift.Hashable {}
+extension IncdOnboarding.AntifraudStepName : Swift.RawRepresentable {}
 extension IncdOnboarding.OmniLivenessSeverity : Swift.Equatable {}
 extension IncdOnboarding.OmniLivenessSeverity : Swift.Hashable {}
 extension IncdOnboarding.OmniLivenessSeverity : Swift.RawRepresentable {}
@@ -2102,6 +2296,8 @@ extension IncdOnboarding.VideoSelfieConfiguration.VideoSelfieCodecType : Swift.R
 extension IncdOnboarding.CameraFacing : Swift.Equatable {}
 extension IncdOnboarding.CameraFacing : Swift.Hashable {}
 extension IncdOnboarding.CameraFacing : Swift.RawRepresentable {}
+extension IncdOnboarding.MLConsentType : Swift.Hashable {}
+extension IncdOnboarding.MLConsentType : Swift.RawRepresentable {}
 extension IncdOnboarding.UserScoreFetchMode : Swift.Equatable {}
 extension IncdOnboarding.UserScoreFetchMode : Swift.Hashable {}
 extension IncdOnboarding.UserScoreFetchMode : Swift.RawRepresentable {}
@@ -2116,6 +2312,9 @@ extension IncdOnboarding.IDCaptureMode : Swift.Hashable {}
 extension IncdOnboarding.IDCaptureMode : Swift.RawRepresentable {}
 extension IncdOnboarding.DocumentType : Swift.Equatable {}
 extension IncdOnboarding.DocumentType : Swift.Hashable {}
+extension IncdOnboarding.Severity : Swift.Equatable {}
+extension IncdOnboarding.Severity : Swift.Hashable {}
+extension IncdOnboarding.Severity : Swift.RawRepresentable {}
 extension IncdOnboarding.IncdIconPosition : Swift.Equatable {}
 extension IncdOnboarding.IncdIconPosition : Swift.Hashable {}
 extension IncdOnboarding.IncdIconPosition : Swift.RawRepresentable {}
