@@ -28,13 +28,13 @@ class DocumentPreViewModel {
     // ---------------------------------------------------------------------
     // MARK: Helper vars
     // ---------------------------------------------------------------------
-    
-    var currentURL: URL {
-        guard let urlString = currentDocument?.urlString,
-              let url = URL(string: urlString) else {
+
+    var currentDataContent: Data {
+        guard let byteElement = currentDocument?.byteArray else {
             fatalError("The url cannot be nil")
         }
-        return url
+
+        return Data(byteElement)
     }
     
     // ---------------------------------------------------------------------
@@ -42,7 +42,7 @@ class DocumentPreViewModel {
     // ---------------------------------------------------------------------
     
     func isLastItem() -> Bool {
-        documents.last?.urlString == currentURL.absoluteString
+        documents.last?.id == currentDocument?.id
     }
     
     func getItemsForNextPreview() -> [DocumentModel] {

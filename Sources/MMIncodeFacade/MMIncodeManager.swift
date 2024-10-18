@@ -28,7 +28,8 @@ final public class MMIncodeManager {
     
     public static var regionCode: String = "ALL"
     private let dispatchGroup = DispatchGroup()
-    
+    private let params: IncodeParams
+
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
@@ -38,6 +39,7 @@ final public class MMIncodeManager {
         themeColors: ThemeColors = DefaultMMTheme.colors,
         completation: Completation? = nil
     ) {
+        self.params = params
         DefaultMMTheme.colors = themeColors
         setupInit(params: params, completation: completation)
     }
@@ -49,7 +51,9 @@ final public class MMIncodeManager {
     private var onboardingSessionConfiguration: IncdOnboardingSessionConfiguration {
         IncdOnboardingSessionConfiguration(
             regionCode: Self.regionCode,
-            queue: .defaultQueue
+            queue: .defaultQueue,
+            interviewId: params.interviewdId,
+            token: params.token
         )
     }
     
