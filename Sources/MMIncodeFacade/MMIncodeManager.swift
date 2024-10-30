@@ -136,4 +136,5 @@ public enum FlowStatus {
     case userFinish(error: String?)
     case error(reason: String)
     case invalidData
+    case userCancelled
 }

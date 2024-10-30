@@ -54,7 +54,7 @@ struct DocumentPreview: View {
         .navigationBarHidden(false)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) { toolbarButtons }
+            ToolbarItem(placement: .topBarLeading) { toolbarButtons }
         }
     }
     
@@ -93,7 +93,7 @@ struct DocumentPreview: View {
     @ViewBuilder
     var toolbarButtons: some View {
         Button { onClose?() } label: {
-            Image("x-mark-icon", bundle: .current)
+            Image("left-icon", bundle: .current)
                 .renderingMode(.template)
                 .resizable(capInsets: .init(top: 0, leading: 0, bottom: 0, trailing: 0), resizingMode: .stretch)
                 .aspectRatio(contentMode: .fill)
