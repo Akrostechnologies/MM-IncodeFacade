@@ -39,7 +39,7 @@ struct DocumentPreview: View {
         
         VStack(spacing: 20) {
             headerView
-            bodyView(url: viewModel.currentURL)
+            bodyView(data: viewModel.currentDataContent)
             FooterDocumentPreview(
                 isLastItem: viewModel.isLastItem(),
                 action: action,
@@ -54,7 +54,7 @@ struct DocumentPreview: View {
         .navigationBarHidden(false)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) { toolbarButtons }
+            ToolbarItem(placement: .topBarTrailing) { toolbarButtons }
         }
     }
     
@@ -63,9 +63,9 @@ struct DocumentPreview: View {
     // ---------------------------------------------------------------------
     
     @ViewBuilder
-    func bodyView(url: URL) -> some View {
+    func bodyView(data: Data) -> some View {
         GeometryReader { proxy in
-            PDFKitView(showing: url)
+            PDFKitView(dataContent: data)
                 .cornerRadius(radius)
                 .overlay(
                     RoundedRectangle(cornerRadius: radius)
@@ -74,7 +74,7 @@ struct DocumentPreview: View {
                 )
         }
     }
-    
+
     @ViewBuilder
     var headerView: some View {
         VStack(spacing: 16) {

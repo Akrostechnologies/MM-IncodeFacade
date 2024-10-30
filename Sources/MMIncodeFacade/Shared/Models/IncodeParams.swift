@@ -16,7 +16,9 @@ public struct IncodeParams {
     let urlString: String
     let apiKey: String
     let testMode: Bool
-    
+    let interviewdId: String
+    let token: String
+
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
@@ -24,10 +26,14 @@ public struct IncodeParams {
     public init(
         urlString: String,
         apiKey: String,
-        testMode: Bool = true
+        testMode: Bool = true,
+        interviewId: String,
+        token: String
     ) {
         self.urlString = urlString
         self.apiKey = apiKey
         self.testMode = testMode
+        self.interviewdId = interviewId
+        self.token = token
     }
 }

@@ -104,5 +104,6 @@ extension SignatureContentViewModel: IncdOnboardingDelegate {
     func userCancelledSession() {
         showingAlertError = false
         showModal = false
+        finishFlow(with: .userCancelled)
     }
 }

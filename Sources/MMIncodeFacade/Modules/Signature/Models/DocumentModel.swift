@@ -13,28 +13,17 @@ public struct DocumentModel {
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
-    
+
+    public let id: UUID = .init()
     let title: String
-    public let urlString: String
-    
+    public let byteArray: [UInt8]
+
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
-    
-    public init(title: String, urlString: String) {
+
+    public init(title: String, byteArray: [UInt8]) {
         self.title = title
-        self.urlString = urlString
-    }
-    
-    // ---------------------------------------------------------------------
-    // MARK: Helper vars
-    // ---------------------------------------------------------------------
-    
-    func getURL() -> URL {
-        .init(string: urlString)!
-    }
-    
-    func toSignDocuments() -> SignDocument {
-        .init(title: title, fileURL: getURL(), signaturePositions: [])
+        self.byteArray = byteArray
     }
 }

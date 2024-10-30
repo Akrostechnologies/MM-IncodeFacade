@@ -13,26 +13,26 @@ struct PDFKitView: UIViewRepresentable {
     // MARK: Properties
     // ---------------------------------------------------------------------
 
-    var url: URL
-    
+    var dataContent: Data
+
     // ---------------------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------------------
-    
-    init(showing url: URL) {
-        self.url = url
+
+    init(dataContent: Data) {
+        self.dataContent = dataContent
     }
-    
+
     // ---------------------------------------------------------------------
     // MARK: UIViewRepresentable
     // ---------------------------------------------------------------------
-    
+
     func makeUIView(context: Context) -> PDFView {
         let pdfView = PDFView()
         pdfView.backgroundColor = DefaultMMTheme.colors.primary.toUIColor
-        
+
         DispatchQueue.global(qos: .utility).async {
-            let document =  PDFDocument(url: url)
+            let document =  PDFDocument(data: dataContent)
             DispatchQueue.main.async {
                 pdfView.document = document
             }
@@ -40,8 +40,8 @@ struct PDFKitView: UIViewRepresentable {
         pdfView.autoScales = true
         return pdfView
     }
-    
+
     func updateUIView(_ uiView: PDFView, context: Context) { }
-    
+
     typealias UIViewType = PDFView
 }
